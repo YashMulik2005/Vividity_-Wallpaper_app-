@@ -8,12 +8,12 @@ const ImageCard = ({ index, item }) => {
       onPress={() => {
         // router.push({ pathname: "/wallpaper", query: { id: item.url } });
         // router.push({ pathname: "/wallpaper/[id]", query: { id: item.url } });
-        router.push(`/wallpaper/1`);
+        router.push(`/wallpaper/${item._id}`);
       }}
     >
       <Image
         key={index}
-        source={{ uri: item.url }}
+        source={{ uri: item.image }}
         className=" h-64 rounded-md object-cover m-1 aspect-[2/4]"
       />
     </TouchableOpacity>

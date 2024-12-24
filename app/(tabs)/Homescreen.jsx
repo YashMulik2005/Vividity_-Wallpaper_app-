@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, FlatList, Image, ImageBackground } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7,8 +14,33 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { ScrollView } from "react-native-virtualized-view";
 import CategoryCard from "../../components/CategoryCard";
 import ImageCard from "../../components/ImageCard";
+import axios from "axios";
+import { router } from "expo-router";
 
 const Homescreen = () => {
+  const [Category, setCategory] = useState([]);
+  const [tranding, settranding] = useState([]);
+  const getCategories = async () => {
+    const res = await axios.get(
+      `https://wallpaper-app-backend.vercel.app/api/category/categories/random`
+    );
+    // console.log(res.data);
+    setCategory(res.data);
+  };
+
+  const getTranding = async () => {
+    const res = await axios.get(
+      `https://wallpaper-app-backend.vercel.app/api/wallpaper/wallpapers/random`
+    );
+    // console.log(res.data);
+    settranding(res.data);
+  };
+
+  useEffect(() => {
+    getCategories();
+    getTranding();
+  }, []);
+
   const arr = [
     {
       url: "https://i.pinimg.com/736x/ab/dd/f6/abddf6022bf2188ef6fe778c54ee9a3e.jpg",
@@ -33,19 +65,23 @@ const Homescreen = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View className=" pt-2">
             <Text className="text-white text-xl font-semibold mx-2">
-              Latest
+              Trending
             </Text>
             <FlatList
-              data={arr}
+              data={tranding}
               renderItem={({ item }) => (
-                <View>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push(`/wallpaper/${item._id}`);
+                  }}
+                >
                   <Image
-                    source={{ uri: item.url }}
+                    source={{ uri: item.image }}
                     className="w-28 h-44 rounded-md mx-2 object-cover"
                   />
-                </View>
+                </TouchableOpacity>
               )}
-              keyExtractor={(item) => item.url}
+              keyExtractor={(item) => item._id}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingVertical: 10 }}
@@ -53,14 +89,17 @@ const Homescreen = () => {
           </View>
 
           <View className="">
-            <Text className="text-white text-xl font-semibold mx-2">
-              Popular Categories{" "}
-              <FontAwesome5 name={"fire"} size={15} color="#00F798" />
-            </Text>
+            <View className=" flex flex-row justify-between items-center w-full">
+              <Text className="text-white text-xl font-semibold mx-2">
+                Popular Categories{" "}
+                <FontAwesome5 name={"fire"} size={15} color="#00F798" />
+              </Text>
+              {/* <Text className=" text-white">Show more</Text> */}
+            </View>
             <FlatList
-              data={arr}
+              data={Category}
               renderItem={({ item }) => <CategoryCard data={item} />}
-              keyExtractor={(item) => item.url}
+              keyExtractor={(item) => item._id}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingVertical: 10 }}

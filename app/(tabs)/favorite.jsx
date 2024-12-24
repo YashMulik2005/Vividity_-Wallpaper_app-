@@ -1,11 +1,12 @@
 import { View, Text, FlatList } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-virtualized-view";
 import ImageCard from "../../components/ImageCard";
 
 const favorite = () => {
+  const [data, setdata] = useState([]);
   const arr = [
     {
       url: "https://i.pinimg.com/736x/ab/dd/f6/abddf6022bf2188ef6fe778c54ee9a3e.jpg",

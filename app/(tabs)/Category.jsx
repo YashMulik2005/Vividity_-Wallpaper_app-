@@ -5,28 +5,27 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-virtualized-view";
 import CategoryCard from "../../components/CategoryCard";
 import { router } from "expo-router";
+import axios from "axios";
 
 const Category = () => {
-  const arr = [
-    {
-      url: "https://i.pinimg.com/736x/ab/dd/f6/abddf6022bf2188ef6fe778c54ee9a3e.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/fa/43/f4/fa43f4dedc679be3cd1dc703fbe6cf88.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/34/8d/20/348d202859f0c9f0ab32876692030989.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/50/e9/94/50e99412a06cc4360670e554f7b2b2e3.jpg",
-    },
-  ];
+  const [data, setdata] = useState([]);
+
+  const getdata = async () => {
+    const data = await axios.get(
+      "https://wallpaper-app-backend.vercel.app/api/category/categories"
+    );
+    // console.log(data.data);
+    setdata(data.data);
+  };
+  useEffect(() => {
+    getdata();
+  }, []);
 
   return (
     <LinearGradient
@@ -40,26 +39,27 @@ const Category = () => {
               Browse By Category{" "}
             </Text>
             <FlatList
-              data={arr}
+              data={data}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => router.push("category/Abstract")}
+                  onPress={() => router.push(`category/${item._id}`)}
                   className="mx-1 my-2"
                 >
                   <ImageBackground
-                    source={{ uri: item.url }}
+                    source={{ uri: item.image }}
                     className=" h-[57px] rounded-md overflow-hidden aspect-[4/2]"
                     imageStyle={{ borderRadius: 10 }}
                   >
                     <View className="flex-1 justify-center items-center bg-black/50">
                       <Text className="text-white text-sm font-bold">
-                        Abstract
+                        {item.name}
                       </Text>
                     </View>
                   </ImageBackground>
                 </TouchableOpacity>
               )}
               numColumns={3}
+              keyExtractor={(item) => item._id}
             />
           </View>
         </ScrollView>
