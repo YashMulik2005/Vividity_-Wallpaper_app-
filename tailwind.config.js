@@ -13,6 +13,7 @@ module.exports = {
         buttonPrimary: "#00F798",
         buttonSecondary: "#00AD9F",
         primaryDark: "#1A1A1A",
+        skeletonDark: "#343434",
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],

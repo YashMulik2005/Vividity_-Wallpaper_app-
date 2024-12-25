@@ -16,45 +16,71 @@ import CategoryCard from "../../components/CategoryCard";
 import ImageCard from "../../components/ImageCard";
 import axios from "axios";
 import { router } from "expo-router";
+import WallapeparSkeleton from "../../components/WallapeparSkeleton";
+import CategorySkeleton from "../../components/CategorySkeleton";
 
 const Homescreen = () => {
   const [Category, setCategory] = useState([]);
   const [tranding, settranding] = useState([]);
+  const [wallpaers, setwallpaers] = useState([]);
+  // const [currentPage, setcurrentPage] = useState(1);
+  // const [hasMore, sethasMore] = useState(true);
+  const [loading, setloading] = useState(false);
+  const [categoryLoader, setcategoryLoader] = useState(false);
+  const [moreloader, setmoreloader] = useState(false);
+  // const [link, setlink] = useState(null);
+  // const [lastlink, setlastlink] = useState(null);
+
   const getCategories = async () => {
+    setcategoryLoader(true);
     const res = await axios.get(
       `https://wallpaper-app-backend.vercel.app/api/category/categories/random`
     );
-    // console.log(res.data);
     setCategory(res.data);
+    setcategoryLoader(false);
   };
 
   const getTranding = async () => {
     const res = await axios.get(
       `https://wallpaper-app-backend.vercel.app/api/wallpaper/wallpapers/random`
     );
-    // console.log(res.data);
     settranding(res.data);
+  };
+
+  const getWallpapers = async () => {
+    console.log("in api");
+    setloading(true);
+    const res = await axios.get(
+      `https://wallpaper-app-backend.vercel.app/api/wallpaper/wallpapers`
+    );
+    console.log(res);
+    setwallpaers(res?.data?.wallpapers);
+    // setcurrentPage(res?.data?.currentPage);
+    // sethasMore(res?.data?.hasMore);
+    // setlink(res?.data?.link);
+    // setlastlink(
+    //   `https://wallpaper-app-backend.vercel.app/api/wallpaper/wallpapers?page=${currentPage}`
+    // );
+    setloading(false);
+  };
+
+  const fetchMore = async () => {
+    if (!hasMore || loading || moreloader || link == null || link === lastlink)
+      return;
+    setmoreloader(true);
+    const res = await axios.get(link);
+    setlastlink(link);
+    setwallpaers((prev) => [...prev, ...res?.data?.wallpapers]);
+    sethasMore(res?.data?.hasMore);
+    setlink(res?.data?.link);
+    setmoreloader(false);
   };
 
   useEffect(() => {
     getCategories();
     getTranding();
+    getWallpapers();
   }, []);
-
-  const arr = [
-    {
-      url: "https://i.pinimg.com/736x/ab/dd/f6/abddf6022bf2188ef6fe778c54ee9a3e.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/fa/43/f4/fa43f4dedc679be3cd1dc703fbe6cf88.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/34/8d/20/348d202859f0c9f0ab32876692030989.jpg",
-    },
-    {
-      url: "https://i.pinimg.com/474x/50/e9/94/50e99412a06cc4360670e554f7b2b2e3.jpg",
-    },
-  ];
 
   return (
     <LinearGradient
@@ -94,12 +120,21 @@ const Homescreen = () => {
                 Popular Categories{" "}
                 <FontAwesome5 name={"fire"} size={15} color="#00F798" />
               </Text>
-              {/* <Text className=" text-white">Show more</Text> */}
             </View>
             <FlatList
-              data={Category}
-              renderItem={({ item }) => <CategoryCard data={item} />}
-              keyExtractor={(item) => item._id}
+              data={
+                categoryLoader
+                  ? [{ _id: "1" }, { _id: "2" }, { _id: "3" }, { _id: "4" }]
+                  : Category
+              }
+              renderItem={({ item }) =>
+                categoryLoader ? (
+                  <CategorySkeleton />
+                ) : (
+                  <CategoryCard data={item} />
+                )
+              }
+              keyExtractor={(item) => item._id.toString()}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingVertical: 10 }}
@@ -115,18 +150,44 @@ const Homescreen = () => {
             </View>
             <FlatList
               className="p-1"
-              data={arr}
-              renderItem={({ item, index }) => (
-                <ImageCard index={index} item={item} />
-              )}
-              keyExtractor={(item) => item.url}
+              data={
+                loading
+                  ? [
+                      { _id: "1" },
+                      { _id: "2" },
+                      { _id: "3" },
+                      { _id: "4" },
+                      { _id: "5" },
+                      { _id: "6" },
+                      { _id: "7" },
+                      { _id: "8" },
+                      { _id: "9" },
+                    ]
+                  : wallpaers
+              }
+              renderItem={({ item, index }) =>
+                loading ? (
+                  <WallapeparSkeleton />
+                ) : (
+                  <ImageCard index={index} item={item} />
+                )
+              }
+              keyExtractor={(item) => item._id.toString()}
               nestedScrollEnabled={true}
               numColumns={3}
-              columnWrapperStyle={{
-                justifyContent: "space-between",
-                marginBottom: 8,
-              }}
               contentContainerStyle={{ paddingHorizontal: 10 }}
+              // onEndReached={fetchMore}
+              // ListFooterComponent={
+              //   moreloader ? (
+              //     <View className=" flex flex-row">
+              //       <WallapeparSkeleton />
+              //       <WallapeparSkeleton />
+              //       <WallapeparSkeleton />
+              //     </View>
+              //   ) : null
+              // }
+              maxToRenderPerBatch={9}
+              windowSize={12}
             />
           </View>
           <StatusBar style="auto" backgroundColor="#1B525B" />
