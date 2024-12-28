@@ -6,6 +6,9 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  StyleSheet,
+  BackHandler,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,18 +21,16 @@ import axios from "axios";
 import { router } from "expo-router";
 import WallapeparSkeleton from "../../components/WallapeparSkeleton";
 import CategorySkeleton from "../../components/CategorySkeleton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Homescreen = () => {
   const [Category, setCategory] = useState([]);
   const [tranding, settranding] = useState([]);
   const [wallpaers, setwallpaers] = useState([]);
-  // const [currentPage, setcurrentPage] = useState(1);
-  // const [hasMore, sethasMore] = useState(true);
   const [loading, setloading] = useState(false);
   const [categoryLoader, setcategoryLoader] = useState(false);
   const [moreloader, setmoreloader] = useState(false);
-  // const [link, setlink] = useState(null);
-  // const [lastlink, setlastlink] = useState(null);
 
   const getCategories = async () => {
     setcategoryLoader(true);
@@ -48,12 +49,10 @@ const Homescreen = () => {
   };
 
   const getWallpapers = async () => {
-    console.log("in api");
     setloading(true);
     const res = await axios.get(
       `https://wallpaper-app-backend.vercel.app/api/wallpaper/wallpapers`
     );
-    console.log(res);
     setwallpaers(res?.data?.wallpapers);
     // setcurrentPage(res?.data?.currentPage);
     // sethasMore(res?.data?.hasMore);
@@ -76,9 +75,55 @@ const Homescreen = () => {
     setmoreloader(false);
   };
 
+  // <View className=" pt-2">
+  //   <Text className="text-white text-xl font-semibold mx-2">Trending</Text>
+  //   <FlatList
+  //     data={tranding}
+  //     renderItem={({ item }) => (
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           router.push(`/wallpaper/${item._id}`);
+  //         }}
+  //       >
+  //         <Image
+  //           source={{ uri: item.image }}
+  //           className="w-28 h-44 rounded-md mx-2 object-cover"
+  //         />
+  //       </TouchableOpacity>
+  //     )}
+  //     keyExtractor={(item) => item._id}
+  //     horizontal
+  //     showsHorizontalScrollIndicator={false}
+  //     contentContainerStyle={{ paddingVertical: 10 }}
+  //   />
+  // </View>;
+  const handleBackPress = () => {
+    Alert.alert(
+      "Exit App",
+      "Are you sure you want to exit?",
+      [
+        { text: "Cancel", onPress: () => null, style: "cancel" },
+        { text: "Exit", onPress: () => BackHandler.exitApp() },
+      ],
+      { cancelable: false }
+    );
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backHandlerListener = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress
+      );
+
+      return () => backHandlerListener.remove();
+    }, [])
+  );
+
   useEffect(() => {
     getCategories();
-    getTranding();
+    // getTranding();
     getWallpapers();
   }, []);
 
@@ -89,34 +134,38 @@ const Homescreen = () => {
     >
       <SafeAreaView className="flex-1">
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View className=" pt-2">
-            <Text className="text-white text-xl font-semibold mx-2">
-              Trending
-            </Text>
-            <FlatList
-              data={tranding}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push(`/wallpaper/${item._id}`);
-                  }}
-                >
+          <View className=" rounded-lg my-1 mx-2">
+            <LinearGradient
+              colors={["#00AD9F", "#5853CD", "#8029E2"]}
+              className="rounded-lg p-4"
+              style={styles.linearGradient}
+            >
+              <View className=" flex flex-row justify-end items-center">
+                <View className=" w-[50%]">
                   <Image
-                    source={{ uri: item.image }}
-                    className="w-28 h-44 rounded-md mx-2 object-cover"
+                    source={require("../../assets/images/logo.png")}
+                    className=" h-28 aspect-square"
                   />
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item._id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingVertical: 10 }}
-            />
+                </View>
+                <View className=" w-[50%] flex flex-col items-end gap-2">
+                  <Text className=" text-white font-bold text-sm md:text-lg lg:text-xl 2xl:text-3xl text-right">
+                    Let AI Paint Your Screen
+                  </Text>
+                  <TouchableOpacity
+                    className="px-2 py-3 rounded-md bg-[#A800F7] block"
+                    onPress={() => router.push("/AiImage/MainScreen")}
+                  >
+                    <Text className="text-white text-sm md:text-lg lg:text-xl 2xl:text-3xl font-semibold text-center">
+                      Generate With A.I
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </LinearGradient>
           </View>
-
           <View className="">
             <View className=" flex flex-row justify-between items-center w-full">
-              <Text className="text-white text-xl font-semibold mx-2">
+              <Text className="text-white text-sm md:text-lg lg:text-xl my-1 2xl:text-3xl font-semibold mx-2">
                 Popular Categories{" "}
                 <FontAwesome5 name={"fire"} size={15} color="#00F798" />
               </Text>
@@ -142,11 +191,25 @@ const Homescreen = () => {
           </View>
 
           <View className="w-full flex items-center mt-2">
-            <View className="bg-buttonSecondary w-1/2 rounded-md py-2">
-              <Text className="text-white text-center text-xl">
-                New Wallpapers{" "}
-                <FontAwesome5 name={"fire"} size={15} color="#00F798" />
-              </Text>
+            <View className=" w-full flex flex-row justify-center items-center ">
+              <View className=" bg-[#262626] w-[90%] flex flex-row justify-center items-center rounded-md">
+                <View className="bg-buttonSecondary w-[50%] rounded-md py-3  ">
+                  <Text className="text-white text-center text-sm md:text-lg lg:text-xl">
+                    New Wallpapers{" "}
+                    <FontAwesome5 name={"fire"} size={15} color="#00F798" />
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/AiImage/MainScreen");
+                  }}
+                  className="bg-[#262626] w-[50%] rounded-r-md py-3"
+                >
+                  <Text className="text-[#A1A1A1] text-center text-sm md:text-lg lg:text-xl">
+                    Generate with A.I{" "}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <FlatList
               className="p-1"
@@ -198,3 +261,9 @@ const Homescreen = () => {
 };
 
 export default Homescreen;
+
+var styles = StyleSheet.create({
+  linearGradient: {
+    borderRadius: 10,
+  },
+});

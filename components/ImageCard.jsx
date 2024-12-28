@@ -1,23 +1,44 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import React from "react";
 import { router } from "expo-router";
+
+const { width } = Dimensions.get("window");
 
 const ImageCard = ({ index, item }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        // router.push({ pathname: "/wallpaper", query: { id: item.url } });
-        // router.push({ pathname: "/wallpaper/[id]", query: { id: item.url } });
         router.push(`/wallpaper/${item._id}`);
       }}
+      style={styles.cardContainer}
     >
       <Image
         key={index}
         source={{ uri: item.image }}
-        className=" h-64 rounded-md object-cover m-1 aspect-[2/4]"
+        style={styles.image}
+        resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  cardContainer: {
+    margin: width * 0.01,
+    borderRadius: 5,
+    overflow: "hidden",
+  },
+  image: {
+    width: width * 0.3,
+    height: width * 0.65,
+    borderRadius: 5,
+  },
+});
 
 export default ImageCard;

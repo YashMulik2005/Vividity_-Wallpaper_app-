@@ -39,7 +39,7 @@ const _layout = () => {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="favorite"
         options={{
           headerShown: false,
@@ -47,7 +47,7 @@ const _layout = () => {
             <Ionicons name={"heart"} size={25} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="Settings"
         options={{

@@ -36,7 +36,7 @@ const CategoryWallpapers = () => {
       <SafeAreaView>
         <ScrollView>
           <View className="px-2 py-4">
-            <Text className="text-white font-bold text-3xl">
+            <Text className="text-white font-bold text-lg md:text-3xl">
               {data[0]?.category?.name}
             </Text>
           </View>

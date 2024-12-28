@@ -1,10 +1,19 @@
 import { View, Text, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Splashscreen = () => {
+  // const getToken = async () => {
+  //   const token = await AsyncStorage.getItem("token");
+  //   console.log(token);
+  // };
+  // useEffect(() => {
+  //   getToken();
+  // }, []);
+
   return (
     <LinearGradient
       colors={["#1B525B", "#3b7a8b", "#1A2433"]}

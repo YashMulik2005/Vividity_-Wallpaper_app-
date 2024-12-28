@@ -14,7 +14,9 @@ const CategoryCard = ({ data }) => {
         imageStyle={{ borderRadius: 10 }}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
-          <Text className="text-white text-xl font-bold">{data.name}</Text>
+          <Text className="text-white text-sm md:text-lg lg:text-xl font-bold">
+            {data.name}
+          </Text>
         </View>
       </ImageBackground>
     </TouchableOpacity>
