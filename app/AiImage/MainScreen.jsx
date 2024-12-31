@@ -58,18 +58,17 @@ const MainScreen = () => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1, height: "100%" }}>
+        <View className=" m-4">
+          <TextInput
+            keyboardType="ascii-capable"
+            className=" w-full text-sm md:text-lg xl:text-3xl text-white rounded-md p-4 px-4 bg-skeletonDark"
+            placeholder="propt"
+            placeholderTextColor="#ffffff"
+            onChangeText={(e) => setPrompt(e)}
+          />
+        </View>
         <ScrollView>
-          <View className="flex flex-col m-4 gap-5 justify-center items-center h-full">
-            <TextInput
-              keyboardType="ascii-capable"
-              value={prompt}
-              multiline
-              numberOfLines={5}
-              onChangeText={(text) => setPrompt(text)}
-              className="p-3 px-4 w-full rounded-md bg-skeletonDark text-white text-xl"
-              placeholder="Enter a prompt"
-              placeholderTextColor="#ffffff"
-            />
+          <View className="flex flex-col gap-5 mx-4 justify-center items-center h-full">
             <FlatList
               data={arr}
               renderItem={({ item }) => (

@@ -78,42 +78,20 @@ const SingleWallpaper = () => {
   // };
 
   const downloadImage = async () => {
-    if (!data.image) {
-      Alert.alert("Error", "Image not available for download.");
-      return;
-    }
-
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Storage permission is required to download the image."
-        );
+      if (!data?.wallpaper.image) {
+        Alert.alert("Error", "Image not available for download.");
         return;
       }
 
-      const downloadUri = data.image;
+      const downloadUri = data?.wallpaper?.image;
       const fileName = downloadUri.split("/").pop();
-      const fileUri =
-        Platform.OS === "android"
-          ? `${FileSystem.documentDirectory}${fileName}`
-          : `${FileSystem.cacheDirectory}${fileName}`;
-
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
       const { uri } = await FileSystem.downloadAsync(downloadUri, fileUri);
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      const album = await MediaLibrary.getAlbumAsync("Download");
-
-      if (album == null) {
-        await MediaLibrary.createAlbumAsync("Download", asset, false);
-      } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-      }
-
-      Alert.alert("Download Complete", "Image saved to the Downloads folder.");
-    } catch (error) {
-      Alert.alert("Download Error", "Failed to download the image.");
-      console.error(error);
+      Alert.alert("Donload sucessful", `Image downlaoded at ${uri}`);
+    } catch (err) {
+      Alert.alert("Error", "Error while downloading a image.");
+      console.log(err);
     }
   };
 

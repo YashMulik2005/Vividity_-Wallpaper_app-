@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
-const _layout = () => {
+const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
@@ -61,4 +61,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default TabLayout;

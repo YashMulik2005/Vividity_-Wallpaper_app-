@@ -13,8 +13,8 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Toast from "react-native-toast-message";
 
 const { width } = Dimensions.get("window");
 
@@ -26,9 +26,14 @@ const Signup = () => {
   const handleSubmit = async () => {
     setloader(true);
     try {
-      if (email.length == 0) {
-      }
-      if (password.length == 0) {
+      if (email.length == 0 || password.length == 0) {
+        Toast.show({
+          type: "error",
+          text1: "Email and password is required.",
+          position: "bottom",
+        });
+        setloader(false);
+        return;
       }
       const res = await axios.post(
         "https://wallpaper-app-backend.vercel.app/api/user/signup",
@@ -44,10 +49,44 @@ const Signup = () => {
         console.log("Failed to sign up. Please try again.");
       }
     } catch (err) {
-      console.error(err);
-      console.log("An error occurred during sign up.");
+      if (err.response && err.response.status === 400) {
+        // console.log("Email is already registered.");
+        Toast.show({
+          type: "error",
+          text1: "Email is already registered.",
+          position: "bottom",
+        });
+      } else {
+        // console.error("Unexpected error:", err);
+        Toast.show({
+          type: "error",
+          text1: "An unexpected error occurred.",
+          position: "bottom",
+        });
+      }
     }
     setloader(false);
+  };
+
+  const toastConfig = {
+    success: ({ text1, props, ...rest }) => {
+      return (
+        <View className=" rounded-md px-5 py-3 bg-black border border-b-green-600">
+          <Text className=" text-white text-sm md:text-mg lg:text-lg xl:text-xl 2xl:text-3xl text-center">
+            {text1}
+          </Text>
+        </View>
+      );
+    },
+    error: ({ text1, props, ...rest }) => {
+      return (
+        <View className=" rounded-md px-5 py-3 bg-black border border-b-red-700">
+          <Text className=" text-white text-sm md:text-mg lg:text-lg xl:text-xl 2xl:text-3xl text-center">
+            {text1}
+          </Text>
+        </View>
+      );
+    },
   };
 
   return (
@@ -94,7 +133,7 @@ const Signup = () => {
                 <ActivityIndicator size="large" color="#ffffff" />
               ) : (
                 <Text className=" text-white text-sm md:text-lg xl:text-xl 2xl:text-3xl font-bold text-center">
-                  Sign In
+                  Sign Up
                 </Text>
               )}
             </TouchableOpacity>
@@ -110,6 +149,7 @@ const Signup = () => {
         </View>
         <StatusBar backgroundColor="#1A1A1A" style="auto" />
       </ScrollView>
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 };

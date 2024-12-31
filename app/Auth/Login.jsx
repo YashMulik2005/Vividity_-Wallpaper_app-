@@ -18,6 +18,7 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,7 +31,12 @@ const Login = () => {
     setloader(true);
     try {
       if (email.length == 0 || password.length == 0) {
-        Alert.alert("Error", "Email and password are required.");
+        Toast.show({
+          type: "error",
+          text1: "Email and password is required.",
+          position: "bottom",
+        });
+        setloader(false);
         return;
       }
       const res = await axios.post(
@@ -54,12 +60,31 @@ const Login = () => {
         );
 
         await AsyncStorage.setItem("user", JSON.stringify(data?.data?.user));
+        Toast.show({
+          type: "success",
+          text1: "Login successful.",
+          position: "bottom",
+        });
         router.push("/(tabs)/Homescreen");
       } else {
         console.log("email or password is wrong");
       }
     } catch (err) {
-      console.error(err);
+      // console.log(err.status);
+      if (err.status === 404) {
+        Toast.show({
+          type: "error",
+          text1: "Username or password is wrong.",
+          position: "bottom",
+        });
+      } else {
+        // console.error("Unexpected error:", err);
+        Toast.show({
+          type: "error",
+          text1: "An unexpected error occurred.",
+          position: "bottom",
+        });
+      }
       console.log("An error occurred during login.");
     }
     setloader(false);
@@ -89,6 +114,27 @@ const Login = () => {
     }, [])
   );
 
+  const toastConfig = {
+    success: ({ text1, props, ...rest }) => {
+      return (
+        <View className=" rounded-md px-5 py-3 bg-black border border-b-green-600">
+          <Text className=" text-white text-sm md:text-mg lg:text-lg xl:text-xl 2xl:text-3xl text-center">
+            {text1}
+          </Text>
+        </View>
+      );
+    },
+    error: ({ text1, props, ...rest }) => {
+      return (
+        <View className=" rounded-md px-5 py-3 bg-black border border-b-red-700">
+          <Text className=" text-white text-sm md:text-mg lg:text-lg xl:text-xl 2xl:text-3xl text-center">
+            {text1}
+          </Text>
+        </View>
+      );
+    },
+  };
+
   return (
     <SafeAreaView className=" bg-primaryDark p-4 px-6 ">
       <ScrollView className="" style={styles.fullScreen}>
@@ -110,7 +156,7 @@ const Login = () => {
               </Text>
               <TextInput
                 keyboardType="email-address"
-                className=" border w-full text-sm md:text-lg text-white rounded-xl px-4 border-gray-600"
+                className=" border w-full text-sm md:text-lg text-white rounded-xl p-3 px-4 border-gray-600"
                 placeholder="email"
                 placeholderTextColor="#ffffff"
                 onChangeText={(e) => setemail(e)}
@@ -120,7 +166,7 @@ const Login = () => {
               </Text>
               <TextInput
                 keyboardType="ascii-capable"
-                className=" border w-full text-sm md:text-lg text-white rounded-xl px-4 border-gray-600"
+                className=" border w-full text-sm md:text-lg text-white rounded-xl p-3 px-4 border-gray-600"
                 placeholder="password"
                 placeholderTextColor="#ffffff"
                 secureTextEntry={true}
@@ -151,6 +197,7 @@ const Login = () => {
         </View>
         <StatusBar backgroundColor="#1A1A1A" style="white" />
       </ScrollView>
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 };
